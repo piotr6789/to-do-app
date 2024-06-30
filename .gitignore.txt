@@ -1,0 +1,36 @@
+# .NET / Visual Studio
+*.obj
+*.exe
+*.dll
+*.log
+*.vscode/
+.vs/
+bin/
+obj/
+backup/
+ipch/
+.nuget/
+*.pidb
+*.user
+*.suo
+*.cache
+*.csproj.user
+
+# Node / npm / Yarn
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# React specific
+/.eslintcache
+/.pnp/
+/.pnp.js
+
+# Jest tests
+/coverage/
+
+# IDE
+/.idea/
+/.vscode/
