@@ -15,6 +15,7 @@ ipch/
 *.suo
 *.cache
 *.csproj.user
+.vs/
 
 # Node / npm / Yarn
 node_modules/
