@@ -37,17 +37,22 @@ namespace ToDoApi.DataSeeder
 
                     var tasks = new List<Data.Models.Task>();
                     var random = new Random();
+                    var numbersToGenerateEstimateTime = Enumerable.Range(30, 2880 / 30)
+                                                                  .Select(x => x * 30)
+                                                                  .ToList();
                     foreach (var assignee in assignees)
                     {
                         for (int i = 0; i < 3; i++)
                         {
                             var status = random.Next(0, 2) == 0 ? Status.TODO : Status.DONE;
+                            var randomEstimateNumbersIndex = random.Next(numbersToGenerateEstimateTime.Count);
                             var task = new Data.Models.Task
                             {
                                 AssigneeId = assignee.Id,
                                 Title = $"Task {i + 1} for {assignee.Name}",
                                 Description = $"Task description {i + 1} for {assignee.Name}",
-                                Status = status
+                                Status = status,
+                                EstimateTime = numbersToGenerateEstimateTime[randomEstimateNumbersIndex]
                             };
                             tasks.Add(task);
                         }

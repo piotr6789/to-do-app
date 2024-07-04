@@ -6,7 +6,6 @@ using ToDoApi.Infrastructure.Data;
 using ToDoApi.Mapping;
 using ToDoApi.Repositories;
 using ToDoApi.Services;
-using Newtonsoft.Json;
 
 namespace ToDoApi
 {
@@ -18,16 +17,24 @@ namespace ToDoApi
 
             builder.Services.AddHttpClient();
 
-            // Add services to the container.
             var configuration = builder.Configuration;
 
-            // Configure DbContext
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowAnyOrigin();
+                });
+            });
+
             builder.Services.AddDbContext<ToDoDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("ToDoDb"));
             });
 
-            // Configure Automapper
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new TaskMappingProfile());
@@ -35,7 +42,6 @@ namespace ToDoApi
             var mapper = mapperConfig.CreateMapper();
             builder.Services.AddSingleton(mapper);
 
-            // Configure Serilog
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
@@ -55,6 +61,8 @@ namespace ToDoApi
             builder.Services.AddScoped<ITaskRepository, TaskRepository>();
             builder.Services.AddScoped<ITaskService, TaskService>();
             builder.Services.AddScoped<ITimeSheetService, TimeSheetService>();
+            builder.Services.AddScoped<IAssigneeRepository, AssigneeRepository>();
+            builder.Services.AddScoped<IAssigneeService, AssigneeService>();
 
             builder.Services.AddSwaggerGen(options =>
             {
@@ -67,7 +75,6 @@ namespace ToDoApi
 
             var app = builder.Build();
 
-            // Seed Assignees on application startup
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ToDoDbContext>();
@@ -75,7 +82,6 @@ namespace ToDoApi
                 await seeder.SeedAsync();
             }
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -84,6 +90,8 @@ namespace ToDoApi
 
             app.UseHttpsRedirection();
             app.UseAuthorization();
+
+            app.UseCors();
 
             app.MapControllers();
 

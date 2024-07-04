@@ -91,9 +91,9 @@ namespace ToDoApi.Services
             return _taskRepository.TaskExists(id);
         }
 
-        public Task<List<TaskDto>> GetTasksByStatusAsync(Status status)
+        public Task<List<TaskDto>> GetTasksByStatusAsync(string assigneeId, Status status)
         {
-            return _taskRepository.GetTasksByStatusAsync(status);
+            return _taskRepository.GetTasksByStatusAsync(assigneeId, status);
         }
     }
 }

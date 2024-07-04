@@ -8,7 +8,7 @@ namespace ToDoApi.Mapping
     {
         public TaskMappingProfile()
         {
-            CreateMap<Data.Models.Task, TaskDto>();
+            CreateMap<Data.Models.Task, TaskDto>().ReverseMap();
             CreateMap<Assignee, AssigneeDto>()
                 .ForMember(dest => dest.Tasks, opt => opt.MapFrom(src => src.Tasks));
         }

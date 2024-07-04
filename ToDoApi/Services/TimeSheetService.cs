@@ -6,14 +6,65 @@ namespace ToDoApi.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
+        private readonly ITaskService _taskService;
         private readonly ILogger<TimeSheetService> _logger;
 
-        public TimeSheetService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<TimeSheetService> logger)
+        public TimeSheetService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ITaskService taskService, ILogger<TimeSheetService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _taskService = taskService;
             _logger = logger;
         }
+
+        public async Task<DateTime> GetCompletionTimeForAssignee(string assigneeId, DateTime startDate)
+        {
+            try
+            {
+                var assigneeTasks = await _taskService.GetTasksByAssigneeIdAsync(assigneeId);
+                var totalMinutes = assigneeTasks.Sum(t => t.EstimateTime);
+
+                var date = startDate;
+                var timeSheetDate = startDate;
+                while (totalMinutes > 0)
+                {
+                    var timeSheet = await GetTimeSheetForAssignee(assigneeId, timeSheetDate.ToString("yyyy-MM"));
+                    if (timeSheet != null)
+                    {
+                        foreach (var entry in timeSheet)
+                        {
+                            var workHours = entry.Hours.Split(',').Select(h => h.Split('-')).ToList();
+                            foreach (var hourRange in workHours)
+                            {
+                                if (hourRange.Length == 2)
+                                {
+                                    var startHour = int.Parse(hourRange[0]);
+                                    var endHour = int.Parse(hourRange[1]);
+                                    var availableMinutes = (endHour - startHour + 1) * 60;
+
+                                    if (availableMinutes >= totalMinutes)
+                                    {
+                                        date = date.AddHours(startHour).AddMinutes(totalMinutes);
+                                        return date;
+                                    }
+
+                                    totalMinutes -= availableMinutes;
+                                    date = date.AddDays(1);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return date;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while getting completion time for assignee: {assigneeId}", ex);
+                throw new Exception($"An error occurred: {ex.Message}", ex);
+            }
+        }
+
 
         public async Task<IEnumerable<TimeSheetDto>> GetTimeSheetForAssignee(string assigneeId, string date)
         {

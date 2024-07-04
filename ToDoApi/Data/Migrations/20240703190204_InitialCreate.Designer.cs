@@ -11,7 +11,7 @@ using ToDoApi.Infrastructure.Data;
 namespace ToDoApi.Data.Migrations
 {
     [DbContext(typeof(ToDoDbContext))]
-    [Migration("20240630182945_InitialCreate")]
+    [Migration("20240703190204_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -53,6 +53,9 @@ namespace ToDoApi.Data.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstimateTime")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

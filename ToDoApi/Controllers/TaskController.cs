@@ -40,12 +40,12 @@ namespace ToDoApi.Controllers
             }
         }
 
-        [HttpGet("tasksByStatus/{status}")]
-        public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasksByStatus(Status status)
+        [HttpGet("tasksByStatus/{assigneeId}/{status}")]
+        public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasksByStatus(string assigneeId, Status status)
         {
             try
             {
-                var tasks = await _taskService.GetTasksByStatusAsync(status);
+                var tasks = await _taskService.GetTasksByStatusAsync(assigneeId, status);
                 if (tasks == null || !tasks.Any())
                 {
                     _logger.LogWarning($"No tasks found for status: {status}");

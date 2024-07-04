@@ -9,7 +9,7 @@ namespace ToDoApi.Repositories
         Task<TaskDto> AddTaskAsync(TaskDto task);
         Task<TaskDto> UpdateTaskAsync(TaskDto task);
         Task<TaskDto> DeleteTaskAsync(int id);
-        Task<List<TaskDto>> GetTasksByStatusAsync(Status status);
+        Task<List<TaskDto>> GetTasksByStatusAsync(string assigneeId, Status status);
         bool TaskExists(int id);
     }
 }

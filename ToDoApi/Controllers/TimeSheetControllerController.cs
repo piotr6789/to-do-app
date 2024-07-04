@@ -17,23 +17,23 @@ namespace ToDoApi.Controllers
         }
 
         [HttpGet("{assigneeId}/timesheet/{date}")]
-        public async Task<IActionResult> GetTimeSheetForAssignee(string assigneeId, string date)
+        public async Task<IActionResult> GetCompletionTimeForAssignee(string assigneeId, DateTime date)
         {
             try
             {
-                var timeSheets = await _timeSheetService.GetTimeSheetForAssignee(assigneeId, date);
-
-                if (timeSheets != null)
+                var completionTime = await _timeSheetService.GetCompletionTimeForAssignee(assigneeId, date);
+                if (completionTime != null)
                 {
-                    return Ok(timeSheets);
+                    return Ok(completionTime);
                 }
                 else
                 {
-                    return StatusCode(500, "Error while retrieving time sheets.");
+                    return StatusCode(500, "Unable to calculate completion date.");
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"An error occurred while getting completion time for assignee: {assigneeId}");
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }

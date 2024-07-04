@@ -54,11 +54,12 @@ namespace ToDoApi.Repositories
             return _mapper.Map<TaskDto>(task);
         }
 
-        public async Task<List<TaskDto>> GetTasksByStatusAsync(Status status)
+        public async Task<List<TaskDto>> GetTasksByStatusAsync(string assigneeId, Status status)
         {
             var tasks = await _dbContext.Tasks
                 .Where(t => t.Status == status)
                 .Include(t => t.Assignee)
+                .Where(a => a.Assignee.Id == assigneeId)
                 .ToListAsync();
 
             return _mapper.Map<List<TaskDto>>(tasks);
